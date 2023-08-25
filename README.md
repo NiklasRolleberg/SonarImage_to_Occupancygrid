@@ -16,7 +16,7 @@ The fifth step is called otsu filtering. It turns the image into a binary image 
 The sixth and last step is mathematical morphological operations. Here we dilate and then erode, this will connect detections that are close and smoothen out edges of the obstacles.
 The image is then published under the topic "morphed"
 
-## Grid_filtering
+## Grid
 This node receives the "morphed" image and transforms the pixels to points on an occupancygrid. The occupancy grid is 2D and is perpendicular with the FLS. Basically you see everything the sonar sees from a side view like so:
     _______________________________________
     |                                      |
