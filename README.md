@@ -4,21 +4,21 @@ This repository contains a ROS package for interpreting the image of the Norbit 
 ## Filter
 The filter takes in the flsdata and publishes an image after every step of the filter algorithm. 
 
-The first step is removing the gain. If you choose to not remove any gain, the publisher will just publish the image received from the fls, otherwise it will publish the fls image with the VGA removed. The image is then published under the topic "gain_removed"
+The first step is removing the gain. If you choose to not remove any gain, the publisher will just publish the image received from the fls, otherwise it will publish the fls image with the VGA removed. The image is then published under the topic "/gain_removed"
 
-The second step is using an image buffer to compare consecutive images and remove random noise. The image is then published under the topic "fused"
+The second step is using an image buffer to compare consecutive images and remove random noise. The image is then published under the topic "/fused"
 
-The third step is linear contrast stretching which make the white parts of the image whiter and the black parts placker. The image is then published under the topic "fused_and_stretched"
+The third step is linear contrast stretching which make the white parts of the image whiter and the black parts placker. The image is then published under the topic "/fused_and_stretched"
 
-The fourth step is a simple median filter to remove salt and pepper noise that may have survived thus far and to smoothen out the image for the next step. The image is then published under the topic "median_filtered"
+The fourth step is a simple median filter to remove salt and pepper noise that may have survived thus far and to smoothen out the image for the next step. The image is then published under the topic "/median_filtered"
 
-The fifth step is called otsu filtering. It turns the image into a binary image by finding a threshold that has the maximum variance between the dark parts and the bright parts of the image. The image is then published under the topic "otsu"
+The fifth step is called otsu filtering. It turns the image into a binary image by finding a threshold that has the maximum variance between the dark parts and the bright parts of the image. The image is then published under the topic "/otsu"
 
 The sixth and last step is mathematical morphological operations. Here we dilate and then erode, this will connect detections that are close and smoothen out edges of the obstacles.
-The image is then published under the topic "morphed"
+The image is then published under the topic "/morphed"
 
 ## Grid
-This node receives the "morphed" image and transforms the pixels to points on an occupancygrid. The occupancy grid is 2D and is perpendicular with the FLS. Basically you see everything the sonar sees from a side view like so:
+This node receives the "/morphed" image and transforms the pixels to points on an occupancygrid. The occupancy grid is 2D and is perpendicular with the FLS. Basically you see everything the sonar sees from a side view like so:
  ![example_grid](https://github.com/RayCali/SonarImage_to_Occupancygrid/assets/90102246/1bae581e-5dc8-4318-b8b7-602e226358f5)
 
 
