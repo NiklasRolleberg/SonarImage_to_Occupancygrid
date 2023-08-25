@@ -1,5 +1,5 @@
 # SonarImage_to_Occupancygrid
-This repository contains a ROS package for interpreting the image of the Norbit WBMS FLS sonar. The package contains filter.py which filters the sonar image from noise and turns the image into a binary image. It also contains grid.py which converts the binary sonar image into an Occupancygrid. To use this package you need to have a parser npde that parses the variables sent by the sonar and publishes them.  
+This repository contains a ROS package for interpreting the image of the Norbit WBMS FLS sonar. The package contains filter.py which filters noise from the sonar image and turns the image into a binary image. It also contains grid.py which converts the binary sonar image into an Occupancygrid. To use this package you need to have a parser npde that parses the variables sent by the sonar and publishes them.  
 
 ## Filter
 The filter takes in the flsdata and publishes an image after every step of the filter algorithm. 
