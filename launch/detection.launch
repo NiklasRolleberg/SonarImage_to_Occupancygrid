@@ -1,0 +1,24 @@
+<launch>
+	<node pkg = "detection" type = "filter.py" name = "filter"  output= "screen"/>
+	<param name="cutoff_percentage" value="0.1"/> <!--How much of image should be cut off at the top due to multipath inference. value 0 - 1-->
+	<param name="remove_vga" value="true"/> <!--Should the VGA image be removed during image filtering?-->
+	<param name="nr_of_pics" value="7"/> <!--How many pictures in the buffer?-->
+	<param name="size_medianfilter" value="5"/> <!--windowsize of the median filter used to remove noise from the image.-->
+	<param name="morph_size" value="5"/> <!--windowsize of the morphological filter used to remove noise from the image.-->
+	<param name="use_log" value="false"/> <!--Choose if the image should be processed with log values-->
+	<param name="use_self_calc_gain" value="true"/> <!--Choose if the image should be processed with self calculated gain. HAVE TO TURN ON "REMOVE_VGA" FOR THIS-->
+
+	<!-- my recommended settings are (0.1, true, 7, 5, 5, false, true) -->
+
+	
+	<node name="fls_link" pkg="tf2_ros" type="static_transform_publisher" args="0 0 -1 0 -0.79 -3.14 base_link fls_link" output ="screen" />
+	
+	<node pkg = "detection" type = "grid.py" name = "grid"  output= "screen"/>
+		<param name="grid_height" value="80"/> <!--Size of the grid in meters-->
+		<param name="grid_width" value="100"/> <!--Size of the grid in meters-->
+		<param name="grid_resolution" value="0.5"/> <!--Resolution of the grid in meters, 0.5 means the side of each cell is 0.5m long-->
+		<param name = "flip_image" value = "true"/> <!--Should the image be flipped? The seabottom in "morphed" should start from top left. If its not, flipping the image is needed.-->
+		<param name = "fade_factor" value = "25"/> <!--How much should the cells value increase and decrease when updated?-->
+	
+
+</launch>
