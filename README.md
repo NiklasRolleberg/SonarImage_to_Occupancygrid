@@ -1,4 +1,4 @@
-#Detection package
+# Detection package
 
 ##Filter
 The filter takes in the flsdata and publishes an image after every step of the filter algorithm. 
