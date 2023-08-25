@@ -29,7 +29,7 @@ Another thing to know is that if for example the sonar travels a longer distance
 Keep in mind right now the transform between the fls_link and base_link has to be manually set. There are two images that show an example of how the transform should be set if the sonar was pointing down with an angle of around 45 degrees. Also depending on how the image looks, you have to flip "morphed" so that the sea bottom starts from top left. There are two images in this catkin package where one is an example where flipping is not needed and the other is an example of when it is needed. Both the images also show how the frames are defined in the sonar image. Setting the transform and flipping the image can be done in the launch file.
 
 
-## launching filter and grid
+## Launching Filter and Grid
 
 Both of the nodes are launched by writing: \
 \
