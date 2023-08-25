@@ -18,13 +18,8 @@ The image is then published under the topic "morphed"
 
 ## Grid
 This node receives the "morphed" image and transforms the pixels to points on an occupancygrid. The occupancy grid is 2D and is perpendicular with the FLS. Basically you see everything the sonar sees from a side view like so:
-    _______________________________________
-    |                                      |
-    |  =                                   |
-    |                                      |
-    |    _____                             |            THE EQUALSIGN IS BASE_LINK
-    |          _________ ________          |
-    |______________________________________|
+ ![example_grid](https://github.com/RayCali/SonarImage_to_Occupancygrid/assets/90102246/1bae581e-5dc8-4318-b8b7-602e226358f5)
+
 
 The grid is made by first extracting the ones in the "morphed". Their position in fls link is then calculated before transforming the points into map frame. The points are then put into their respective cells in the occupancygrid. The value of the cell depends on how many times the same cells has been seen. For example, if in an iteration, an obstacle is seen in a cell, the new value of said cell will be its current value + fade_factor (the limit is 100). The fade_factor can be chosen in the launch file. The same goes for when there is no obstacle in a cell, its new value will be its current value - fade_factor (the limit is 0). This means that if an obstacle was randomly seen in one iteration but immedieatly dissappears in the next, the "fake" obstacle will fade out immediatly. However if an obstacle is seen for a long time, then randomly dissappears in just one iteration, the obstacle will still be shown in the grade but with a lighter shade. This can prove useful if you want to use som obstacle avoidance since the cells value represents some kind of confidence. 
 
