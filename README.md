@@ -33,7 +33,7 @@ Keep in mind right now the transform between the fls_link and base_link has to b
 
 Both of the nodes are launched by writing: \
 \
-"roslaunch detection detection.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)".
+roslaunch detection detection.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
 
 The second part of the command (2> >(grep -v TF_REPEATED_DATA buffer_core)) is used to remove annoying warnings about ignoring frames that have been published in a too high rate. These warning occur when launching the grid node but i can't seem to find the source of the warning.
 
