@@ -11,7 +11,7 @@ __author__ = "Rayan Cali"
 __author_email = "rayanc@kth.se"
 
 def image_callback(msg):
-    global queue, amount_of_pics, pub, sub_goal,done_once,iteration, width, height, fused
+    global queue, amount_of_pics, pub, sub_goal,done_once,iteration, width, height, fused, cutoff_perc
         #delete the first element and add the new one
     t = time.time()
     bin_max = ((msg.t0 + msg.num_samples)*msg.snd_velocity)/(2*msg.sample_rate)
@@ -26,7 +26,6 @@ def image_callback(msg):
         width = msg.num_beams
         imagearray = np.array(msg.fls_raw.data[:-width])
         imagearray = np.reshape(imagearray, (height,width))
-        cutoff_perc = float(rospy.get_param("/cutoff_percentage"))
         imagearray[0:int(height*cutoff_perc), :] = 0
         # imagearray[:, 0:int(width*0.3)] = 0
         imagearray, vgamask=remove_gains(imagearray, msg.gain, msg.vga_t1,msg.vga_t2,msg.vga_g1,msg.vga_g2,msg.snd_velocity, msg.tx_freq, int(height*cutoff_perc), bin_max)
@@ -47,7 +46,7 @@ def image_callback(msg):
 
 
 def remove_gains(imagearray, gain, t1, t2, g1, g2, snd_vel, freq, start_range, max_range):
-    global gainc, height
+    global height, remove_vga, use_self_calc_gain
     vgamask = np.zeros(imagearray.shape[0])
     vgamask[:t1] = g1
     vgamask[t2:] = g2
@@ -55,10 +54,10 @@ def remove_gains(imagearray, gain, t1, t2, g1, g2, snd_vel, freq, start_range, m
     vgamask = vgamask.transpose()
     f= lambda x: 10**(x/20)
     vgamask = f(vgamask)
-    if rospy.get_param("/remove_vga"):
+    if remove_vga:
         imagearray = (imagearray.transpose()/vgamask).transpose()
     imagearray = imagearray/((10**gain)/20)
-    if rospy.get_param("/use_self_calc_gain"):
+    if use_self_calc_gain:
         start_range = start_range*max_range/height
         viscosity = 1.18e-3 #viscosity of seawater 15 degrees celcius
         angfreq = 2*math.pi*freq*1e3 #angular frequency
@@ -82,10 +81,10 @@ def remove_gains(imagearray, gain, t1, t2, g1, g2, snd_vel, freq, start_range, m
 
 
 def fuse_the_pics(vgamask,gain):
-    global queue,amount_of_pics, pub, sub_goal,done_once,fused
+    global queue,amount_of_pics, pub, sub_goal,done_once,fused, remove_vga, use_self_calc_gain, use_log
     summed_pics = np.sum(queue, axis=0)
     summed_pics = summed_pics*((10**gain)/20)
-    if rospy.get_param("/use_log"):
+    if use_log:
         summed_pics_nozeros = summed_pics[summed_pics != 0]
         summed_pics_nozeros = np.log(summed_pics_nozeros)
         sorted_summed_pics_non_zeros = -np.sort(-summed_pics_nozeros, axis=None)
@@ -103,7 +102,7 @@ def fuse_the_pics(vgamask,gain):
         th = np.sum(top1percent_summed_pics)/(len(top1percent_summed_pics)*amount_of_pics)
         summed_pics[summed_pics <= th] = 0
     
-    if rospy.get_param("/remove_vga") and not rospy.get_param("/use_self_calc_gain"):
+    if remove_vga and not use_self_calc_gain:
         summed_pics = (summed_pics.transpose()*vgamask).transpose()
     
     max_value = np.max(summed_pics)#sorted_summed_pics_non_zeros[0]
@@ -136,9 +135,9 @@ def linear_stretch(fused_pic):
     return contrast_stretched
 
 def median_filtered(pic):
-    global fused,pub3
+    global fused,pub3, size_medianfilter
     cv_pic = pic.astype(np.uint8)
-    median_filtered_pic = cv2.medianBlur(cv_pic, rospy.get_param("/size_medianfilter"))
+    median_filtered_pic = cv2.medianBlur(cv_pic, size_medianfilter)
     fused.data = median_filtered_pic.flatten().tolist()
     pub3.publish(fused)
     return median_filtered_pic
@@ -152,9 +151,8 @@ def otsu_algorithm(pic):
     pub4.publish(fused)
     return otsu
 def morphological_operations(pic):
-    global fused,pub5
-    size = int(rospy.get_param("/morph_size"))
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
+    global fused,pub5, morph_width, morph_height
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (morph_width, morph_height))
     dilated = cv2.dilate(pic,kernel,iterations = 1)
     eroded = cv2.erode(dilated,kernel,iterations = 1)
     morphed = eroded
@@ -183,9 +181,15 @@ pub4 = rospy.Publisher('/otsu', Image, queue_size=1)
 pub5 = rospy.Publisher('/morphed', Image, queue_size=1)
 
 amount_of_pics = rospy.get_param("/nr_of_pics")
+cutoff_perc = rospy.get_param("/cutoff_percentage")
+remove_vga = rospy.get_param("/remove_vga")
+use_self_calc_gain = rospy.get_param("/use_self_calc_gain")
+use_log = rospy.get_param("/use_log")
+size_medianfilter = rospy.get_param("/size_medianfilter")
+morph_width = rospy.get_param("/morph_width")
+morph_height = rospy.get_param("/morph_height")
 queue = []
 iteration = 0
-gainc= 1
 done_once = False
 width = 256
 height = 650

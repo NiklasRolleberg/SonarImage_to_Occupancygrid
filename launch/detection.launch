@@ -4,11 +4,12 @@
 	<param name="remove_vga" value="true"/> <!--Should the VGA image be removed during image filtering?-->
 	<param name="nr_of_pics" value="7"/> <!--How many pictures in the buffer?-->
 	<param name="size_medianfilter" value="5"/> <!--windowsize of the median filter used to remove noise from the image.-->
-	<param name="morph_size" value="5"/> <!--windowsize of the morphological filter used to remove noise from the image.-->
+	<param name="morph_width" value="5"/> <!--windowwidth of the morphological filter used to remove noise from the image.-->
+	<param name="morph_height" value="5"/> <!--windowheight of the morphological filter used to remove noise from the image.-->
 	<param name="use_log" value="false"/> <!--Choose if the image should be processed with log values-->
 	<param name="use_self_calc_gain" value="true"/> <!--Choose if the image should be processed with self calculated gain. HAVE TO TURN ON "REMOVE_VGA" FOR THIS-->
 
-	<!-- my recommended settings are (0.1, true, 7, 5, 5, false, true) -->
+	<!-- my recommended settings are (0.1, true, 7, 5, 5, 5, false, true) -->
 
 	
 	<node name="fls_link" pkg="tf2_ros" type="static_transform_publisher" args="0 0 -1 0 -0.79 -3.14 base_link fls_link" output ="screen" />
