@@ -11,7 +11,7 @@ from cv_bridge import CvBridge
 from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import Pose, Point, Quaternion, PoseStamped
 import time
-from Norbit_FLS_driver.msg import Fls
+from norbit_fls_driver.msg import Fls
 __author__ = "Rayan Cali"
 __author_email = "rayanc@kth.se"
 

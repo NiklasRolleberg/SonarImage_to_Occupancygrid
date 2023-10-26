@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 from sensor_msgs.msg import Image
-from Norbit_FLS_driver.msg import Fls
+from norbit_fls_driver.msg import Fls
 import numpy as np
 import cv2
 import time
