@@ -26,9 +26,9 @@ def image_callback(msg: Image):
         matrix = np.zeros((grid.info.height,grid.info.width), dtype=np.int8)
     else:
         matrix = -fade_factor*np.ones((grid.info.height,grid.info.width), dtype=np.int8)
-    trans = tfBuffer.lookup_transform("odom", "fls_link", rospy.Time(0))
-    trans2 = tfBuffer.lookup_transform("odom", "base_link", rospy.Time(0))
-    trans_base = tfBuffer.lookup_transform("base_link", "odom", rospy.Time(0)) # for use in update_matrix()
+    trans = tfBuffer.lookup_transform("map", "lolo/fls_link", rospy.Time(0))
+    trans2 = tfBuffer.lookup_transform("map", "lolo/base_link", rospy.Time(0))
+    trans_base = tfBuffer.lookup_transform("lolo/base_link", "map", rospy.Time(0)) # for use in update_matrix()
     anglelist = trans2.transform.rotation.x, trans2.transform.rotation.y, trans2.transform.rotation.z, trans2.transform.rotation.w
     yaw = tf.transformations.euler_from_quaternion(anglelist)[2]
     imagearray = np.array(cv_image)
@@ -98,11 +98,11 @@ def update_matrix(): #checks if matrix need to be rolled forward or backward dep
         t = time.time()
         base_val = prev_matrix[base_pos,base_pos]
         try:
-            current_base = tfBuffer.lookup_transform("odom", "base_link", rospy.Time(0))
+            current_base = tfBuffer.lookup_transform("map", "lolo/base_link", rospy.Time(0))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rospy.loginfo("no transform")
         diffpose = PoseStamped()
-        diffpose.header.frame_id = "odom"
+        diffpose.header.frame_id = "map"
         diffpose.pose.position.x,diffpose.pose.position.y, diffpose.pose.position.z = current_base.transform.translation.x, current_base.transform.translation.y, current_base.transform.translation.z
         diffpose.pose.orientation.x, diffpose.pose.orientation.y,diffpose.pose.orientation.z,diffpose.pose.orientation.w = current_base.transform.rotation.x, current_base.transform.rotation.y, current_base.transform.rotation.z, current_base.transform.rotation.w
         diffpose = tf2_geometry_msgs.do_transform_pose(diffpose, trans_base)
@@ -111,22 +111,22 @@ def update_matrix(): #checks if matrix need to be rolled forward or backward dep
         if abs(yaw)<0.017: #1 degree
             dist = abs(int(diffpose.pose.position.x/grid.info.resolution))
             if diffpose.pose.position.x > grid.info.resolution:
-                trans_base = tfBuffer.lookup_transform("base_link", "odom", rospy.Time(0))
+                trans_base = tfBuffer.lookup_transform("lolo/base_link", "map", rospy.Time(0))
                 prev_matrix = np.roll(prev_matrix, -dist, axis=1)
                 prev_matrix[:, -dist:] = 0
                 prev_matrix[base_pos, (base_pos-dist)] = 0
                 prev_matrix[base_pos,base_pos] = base_val
                 rospy.loginfo("rolled fwd")
-                trans_base = tfBuffer.lookup_transform("base_link", "odom", rospy.Time(0))
+                trans_base = tfBuffer.lookup_transform("lolo/base_link", "map", rospy.Time(0))
                 
             elif diffpose.pose.position.x < -grid.info.resolution:
-                trans_base = tfBuffer.lookup_transform("base_link", "odom", rospy.Time(0))
+                trans_base = tfBuffer.lookup_transform("lolo/base_link", "map", rospy.Time(0))
                 prev_matrix = np.roll(prev_matrix, dist, axis=1)
                 prev_matrix[:, 0:dist] = 0
                 prev_matrix[base_pos,(base_pos+dist)] = 0
                 prev_matrix[base_pos,base_pos] = base_val
                 rospy.loginfo("rolled bwd")
-                trans_base = tfBuffer.lookup_transform("base_link", "odom", rospy.Time(0))
+                trans_base = tfBuffer.lookup_transform("lolo/base_link", "map", rospy.Time(0))
         elapsed = time.time() - t
         # rospy.loginfo(elapsed)
 
@@ -158,7 +158,7 @@ fade_factor = rospy.get_param('/fade_factor')
 
 
 if __name__ == '__main__':
-    grid.header.frame_id = "odom"
+    grid.header.frame_id = "lolo/base_link"
     grid.info.resolution = rospy.get_param('/grid_resolution')
     height = rospy.get_param('/grid_height')
     width = rospy.get_param('/grid_width')

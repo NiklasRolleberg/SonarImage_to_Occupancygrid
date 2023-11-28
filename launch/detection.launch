@@ -12,7 +12,7 @@
 	<!-- my recommended settings are (0.1, true, 7, 5, 5, 5, false, true) -->
 
 	
-	<node name="fls_link" pkg="tf2_ros" type="static_transform_publisher" args="0 0 -1 0 -0.79 -3.14 base_link fls_link" output ="screen" />
+	<node name="fls_link" pkg="tf2_ros" type="static_transform_publisher" args="0 0 -1 0 -0.79 -3.14 lolo/base_link lolo/fls_link" output ="screen" />
 	
 	<node pkg = "detection" type = "grid.py" name = "grid"  output= "screen"/>
 		<param name="grid_height" value="80"/> <!--Size of the grid in meters-->
